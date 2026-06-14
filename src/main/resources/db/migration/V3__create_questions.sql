@@ -10,5 +10,5 @@ CREATE TABLE questions
     sub_section_id BIGINT       NOT NULL,
     created_at     DATETIME(6),
     updated_at     DATETIME(6),
-    CONSTRAINT fk_questions_sub_section FOREIGN KEY (sub_section_id) REFERENCES sub_sections (id)
+    CONSTRAINT fk_questions_sub_section FOREIGN KEY (sub_section_id) REFERENCES sub_sections (id) ON DELETE CASCADE
 );

@@ -6,6 +6,7 @@ public record SectionResponse(
         Long id,
         String title,
         String description,
+        Integer displayOrder,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}

@@ -1,8 +1,12 @@
 package com.interviewprep.section.entity;
 
 import com.interviewprep.common.util.Auditable;
+import com.interviewprep.subsection.entity.SubSection;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "main_sections")
@@ -22,4 +26,9 @@ public class MainSection extends Auditable {
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    private Integer displayOrder;
+
+    @OneToMany(mappedBy = "mainSection", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SubSection> subSections = new ArrayList<>();
 }

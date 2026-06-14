@@ -12,6 +12,8 @@ public record SubSectionUpdateRequest(
         @Size(max = 5000, message = "Description must not exceed 5000 characters")
         String description,
 
+        Integer displayOrder,
+
         @NotNull(message = "Main section ID must not be null")
         Long mainSectionId
 ) {}

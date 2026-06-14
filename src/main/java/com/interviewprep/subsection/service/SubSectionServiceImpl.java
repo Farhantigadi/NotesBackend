@@ -36,6 +36,7 @@ public class SubSectionServiceImpl implements SubSectionService {
         SubSection entity = SubSection.builder()
                 .title(request.title())
                 .description(request.description())
+                .displayOrder(request.displayOrder())
                 .mainSection(section)
                 .build();
         return mapper.toResponse(repository.save(entity));

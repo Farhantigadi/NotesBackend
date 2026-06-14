@@ -6,6 +6,7 @@ public record SubSectionResponse(
         Long id,
         String title,
         String description,
+        Integer displayOrder,
         Long mainSectionId,
         String mainSectionTitle,
         LocalDateTime createdAt,
