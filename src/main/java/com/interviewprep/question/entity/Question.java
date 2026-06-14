@@ -35,6 +35,14 @@ public class Question extends Auditable {
 
     private Integer displayOrder;
 
+    @Column(length = 512)
+    private String imageUrl;
+
+    private Integer imageWidth;
+
+    @Column(length = 10)
+    private String imageAlign;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sub_section_id", nullable = false)
     private SubSection subSection;

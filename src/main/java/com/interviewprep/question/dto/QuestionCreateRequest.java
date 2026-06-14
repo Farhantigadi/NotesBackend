@@ -17,6 +17,10 @@ public record QuestionCreateRequest(
 
         String explanation,
         Integer displayOrder,
+        Integer imageWidth,
+
+        @Size(max = 10, message = "Image align must be left, center or right")
+        String imageAlign,
 
         @NotNull(message = "Sub-section ID must not be null")
         Long subSectionId

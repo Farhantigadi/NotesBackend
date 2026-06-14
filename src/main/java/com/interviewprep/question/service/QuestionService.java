@@ -3,6 +3,7 @@ package com.interviewprep.question.service;
 import com.interviewprep.question.dto.QuestionCreateRequest;
 import com.interviewprep.question.dto.QuestionResponse;
 import com.interviewprep.question.dto.QuestionUpdateRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,4 +20,8 @@ public interface QuestionService {
     QuestionResponse update(Long id, QuestionUpdateRequest request);
 
     void delete(Long id);
+
+    QuestionResponse uploadImage(Long id, MultipartFile file);
+
+    QuestionResponse deleteImage(Long id);
 }

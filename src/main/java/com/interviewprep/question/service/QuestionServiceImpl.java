@@ -1,6 +1,7 @@
 package com.interviewprep.question.service;
 
 import com.interviewprep.common.exception.ResourceNotFoundException;
+import com.interviewprep.common.storage.ImageStorageService;
 import com.interviewprep.question.dto.QuestionCreateRequest;
 import com.interviewprep.question.dto.QuestionResponse;
 import com.interviewprep.question.dto.QuestionUpdateRequest;
@@ -11,6 +12,7 @@ import com.interviewprep.subsection.entity.SubSection;
 import com.interviewprep.subsection.repository.SubSectionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,13 +23,16 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository repository;
     private final SubSectionRepository subSectionRepository;
     private final QuestionMapper mapper;
+    private final ImageStorageService imageStorageService;
 
     public QuestionServiceImpl(QuestionRepository repository,
                                SubSectionRepository subSectionRepository,
-                               QuestionMapper mapper) {
+                               QuestionMapper mapper,
+                               ImageStorageService imageStorageService) {
         this.repository = repository;
         this.subSectionRepository = subSectionRepository;
         this.mapper = mapper;
+        this.imageStorageService = imageStorageService;
     }
 
     @Override
@@ -40,6 +45,8 @@ public class QuestionServiceImpl implements QuestionService {
                 .codeLanguage(request.codeLanguage())
                 .explanation(request.explanation())
                 .displayOrder(request.displayOrder())
+                .imageWidth(request.imageWidth())
+                .imageAlign(request.imageAlign())
                 .subSection(subSection)
                 .build();
         return mapper.toResponse(repository.save(entity));
@@ -74,8 +81,25 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public void delete(Long id) {
-        getOrThrow(id);
+        Question entity = getOrThrow(id);
+        imageStorageService.delete(entity.getImageUrl());
         repository.deleteById(id);
+    }
+
+    @Override
+    public QuestionResponse uploadImage(Long id, MultipartFile file) {
+        Question entity = getOrThrow(id);
+        imageStorageService.delete(entity.getImageUrl());
+        entity.setImageUrl(imageStorageService.store(file));
+        return mapper.toResponse(repository.save(entity));
+    }
+
+    @Override
+    public QuestionResponse deleteImage(Long id) {
+        Question entity = getOrThrow(id);
+        imageStorageService.delete(entity.getImageUrl());
+        entity.setImageUrl(null);
+        return mapper.toResponse(repository.save(entity));
     }
 
     private Question getOrThrow(Long id) {

@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -61,5 +63,18 @@ public class QuestionController {
     @Operation(summary = "Delete question")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @PostMapping(value = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload image for question")
+    public ApiResponse<QuestionResponse> uploadImage(@PathVariable Long id,
+                                                     @RequestParam("file") MultipartFile file) {
+        return ApiResponse.success("Image uploaded successfully", service.uploadImage(id, file));
+    }
+
+    @DeleteMapping("/{id}/image")
+    @Operation(summary = "Delete image for question")
+    public ApiResponse<QuestionResponse> deleteImage(@PathVariable Long id) {
+        return ApiResponse.success("Image deleted successfully", service.deleteImage(id));
     }
 }

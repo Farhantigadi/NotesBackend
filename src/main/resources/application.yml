@@ -20,9 +20,20 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  servlet:
+    multipart:
+          enabled: true
+          max-file-size: 10MB
+          max-request-size: 10MB
 
 server:
   port: 8080
+
+app:
+  upload:
+    dir: uploads
+  base-url: http://localhost:8080
+
 
 springdoc:
   api-docs:

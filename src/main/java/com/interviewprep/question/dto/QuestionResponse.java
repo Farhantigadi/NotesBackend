@@ -12,6 +12,9 @@ public record QuestionResponse(
         Integer displayOrder,
         Long subSectionId,
         String subSectionTitle,
+        String imageUrl,
+        Integer imageWidth,
+        String imageAlign,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {}
