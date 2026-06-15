@@ -5,6 +5,7 @@ CREATE TABLE questions
     answer         LONGTEXT,
     code_snippet   LONGTEXT,
     code_language  VARCHAR(100),
+    code_blocks    LONGTEXT,
     explanation    LONGTEXT,
     display_order  INT,
     image_url      VARCHAR(512),

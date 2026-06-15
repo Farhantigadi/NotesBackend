@@ -15,6 +15,8 @@ public record QuestionUpdateRequest(
         @Size(max = 100, message = "Code language must not exceed 100 characters")
         String codeLanguage,
 
+        String codeBlocks,
+
         String explanation,
         Integer displayOrder,
 

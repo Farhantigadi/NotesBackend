@@ -88,6 +88,7 @@ public class ExportService {
                         .answer(q.getAnswer())
                         .codeSnippet(q.getCodeSnippet())
                         .codeLanguage(q.getCodeLanguage())
+                        .codeBlocks(q.getCodeBlocks())
                         .explanation(q.getExplanation())
                         .displayOrder(q.getDisplayOrder())
                         .imageUrl(q.getImageUrl())

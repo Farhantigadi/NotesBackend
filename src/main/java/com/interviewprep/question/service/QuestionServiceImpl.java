@@ -43,6 +43,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .answer(request.answer())
                 .codeSnippet(request.codeSnippet())
                 .codeLanguage(request.codeLanguage())
+                .codeBlocks(request.codeBlocks())
                 .explanation(request.explanation())
                 .displayOrder(request.displayOrder())
                 .imageUrl(request.imageUrl())

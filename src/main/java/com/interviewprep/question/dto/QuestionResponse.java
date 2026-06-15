@@ -8,6 +8,7 @@ public record QuestionResponse(
         String answer,
         String codeSnippet,
         String codeLanguage,
+        String codeBlocks,
         String explanation,
         Integer displayOrder,
         Long subSectionId,

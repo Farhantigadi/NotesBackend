@@ -31,6 +31,9 @@ public class Question extends Auditable {
     private String codeLanguage;
 
     @Column(columnDefinition = "LONGTEXT")
+    private String codeBlocks; // JSON array: [{"code":"...","language":"..."}]
+
+    @Column(columnDefinition = "LONGTEXT")
     private String explanation;
 
     private Integer displayOrder;

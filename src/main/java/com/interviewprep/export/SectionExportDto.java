@@ -30,6 +30,7 @@ public class SectionExportDto {
         private final String answer;
         private final String codeSnippet;
         private final String codeLanguage;
+        private final String codeBlocks;
         private final String explanation;
         private final Integer displayOrder;
         private final String imageUrl;

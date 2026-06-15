@@ -1,5 +1,7 @@
 package com.interviewprep.export;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class PdfGeneratorService {
@@ -51,6 +54,8 @@ public class PdfGeneratorService {
     private static final HttpClient HTTP_CLIENT = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(5))
             .build();
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     // ── Fonts (registered at startup, fallback to built-ins) ──────────────────
     private final Font fontSectionTitle;
@@ -192,7 +197,21 @@ public class PdfGeneratorService {
             addImage(doc, q.getImageUrl(), q.getImageWidth(), q.getImageAlign());
         }
 
-        if (hasText(q.getCodeSnippet())) {
+        if (hasText(q.getCodeBlocks())) {
+            try {
+                List<Map<String, String>> blocks = OBJECT_MAPPER.readValue(
+                        q.getCodeBlocks(), new TypeReference<>() {});
+                for (Map<String, String> block : blocks) {
+                    String code = block.get("code");
+                    String language = block.get("language");
+                    if (hasText(code)) {
+                        addCodeBlock(doc, code, language);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("Failed to parse codeBlocks JSON for question id={}: {}", q.getId(), e.getMessage());
+            }
+        } else if (hasText(q.getCodeSnippet())) {
             addCodeBlock(doc, q.getCodeSnippet(), q.getCodeLanguage());
         }
 
