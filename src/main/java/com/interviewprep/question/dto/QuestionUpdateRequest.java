@@ -17,6 +17,10 @@ public record QuestionUpdateRequest(
 
         String explanation,
         Integer displayOrder,
+
+        @Size(max = 512)
+        String imageUrl,
+
         Integer imageWidth,
 
         @Size(max = 10, message = "Image align must be left, center or right")

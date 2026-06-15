@@ -45,6 +45,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .codeLanguage(request.codeLanguage())
                 .explanation(request.explanation())
                 .displayOrder(request.displayOrder())
+                .imageUrl(request.imageUrl())
                 .imageWidth(request.imageWidth())
                 .imageAlign(request.imageAlign())
                 .subSection(subSection)

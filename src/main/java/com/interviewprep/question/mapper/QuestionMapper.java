@@ -12,7 +12,7 @@ public interface QuestionMapper {
     @Mapping(target = "subSectionTitle", source = "subSection.title")
     QuestionResponse toResponse(Question entity);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "subSection", ignore = true)
+    @Mapping(target = "id", ignore = true)
     void updateEntity(QuestionUpdateRequest request, @MappingTarget Question entity);
 }

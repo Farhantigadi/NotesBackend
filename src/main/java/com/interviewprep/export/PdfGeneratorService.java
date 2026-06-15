@@ -304,12 +304,14 @@ public class PdfGeneratorService {
         codeTable.setWidthPercentage(100);
         codeTable.setSpacingBefore(0);
         codeTable.setSpacingAfter(16);
+        codeTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
         PdfPCell codeCell = new PdfPCell();
-        codeCell.setBackgroundColor(new BaseColor(0x1E, 0x1E, 0x2E));
+        codeCell.setCellEvent(new SolidBackgroundEvent(new BaseColor(0x1E, 0x1E, 0x2E)));
         codeCell.setPadding(10f);
         codeCell.setBorderColor(new BaseColor(0x31, 0x32, 0x44));
         codeCell.setBorderWidth(1f);
+        codeCell.setUseBorderPadding(true);
 
         if (hasText(language)) {
             Font labelFont = new Font(Font.FontFamily.COURIER, 9f, Font.BOLD,
@@ -389,6 +391,27 @@ public class PdfGeneratorService {
             return BaseFont.createFont(fallback, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
         } catch (DocumentException | IOException e) {
             throw new RuntimeException("Failed to load fallback font: " + fallback, e);
+        }
+    }
+
+    // ── Cell background event (paints over page bg) ───────────────────────────
+
+    private static class SolidBackgroundEvent implements PdfPCellEvent {
+        private final BaseColor color;
+
+        SolidBackgroundEvent(BaseColor color) {
+            this.color = color;
+        }
+
+        @Override
+        public void cellLayout(PdfPCell cell, Rectangle position, PdfContentByte[] canvases) {
+            PdfContentByte canvas = canvases[PdfPTable.BACKGROUNDCANVAS];
+            canvas.saveState();
+            canvas.setColorFill(color);
+            canvas.rectangle(position.getLeft(), position.getBottom(),
+                    position.getWidth(), position.getHeight());
+            canvas.fill();
+            canvas.restoreState();
         }
     }
 
