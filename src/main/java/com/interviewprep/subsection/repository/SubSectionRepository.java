@@ -8,4 +8,6 @@ import java.util.List;
 public interface SubSectionRepository extends JpaRepository<SubSection, Long> {
 
     List<SubSection> findByMainSectionId(Long mainSectionId);
+
+    List<SubSection> findByMainSectionIdOrderByDisplayOrderAsc(Long mainSectionId);
 }
