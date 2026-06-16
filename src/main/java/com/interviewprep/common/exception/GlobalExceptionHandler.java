@@ -1,5 +1,6 @@
 package com.interviewprep.common.exception;
 
+import com.interviewprep.auth.InvalidCredentialsException;
 import com.interviewprep.common.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -17,6 +18,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<Void> handleNotFound(ResourceNotFoundException ex) {
+        return ApiResponse.error(ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiResponse<Void> handleInvalidCredentials(InvalidCredentialsException ex) {
         return ApiResponse.error(ex.getMessage());
     }
 

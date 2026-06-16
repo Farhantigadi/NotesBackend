@@ -33,6 +33,9 @@ app:
   upload:
     dir: uploads
   base-url: http://localhost:8080
+  jwt:
+    secret: 7a8f3e2b1c9d4f6e0a5b8c2d7e1f4a9b3c6d0e5f2a8b1c4d7e0f3a6b9c2d5e8
+    expiration-ms: 86400000
 
 
 springdoc:
