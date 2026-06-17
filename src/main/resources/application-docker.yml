@@ -5,6 +5,4 @@ spring:
 #    this file is only for docker use, when we run  docker to find or cover mysql
 
 #and to run use this command
-#  docker run -p 8080:8080 \
-#  -e SPRING_PROFILES_ACTIVE=docker \
-#  interview-backend
+# docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker interview-backend

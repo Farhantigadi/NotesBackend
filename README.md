@@ -103,67 +103,23 @@ The server starts at `http://localhost:8080`.
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-### Option A — Run only the app in Docker (use your local MySQL)
+### 1. Update `application-docker.yml`
 
-**1. Build the image:**
+Open `src/main/resources/application-docker.yml` and update your database name if needed. Everything else is already configured to connect to your local MySQL.
 
-```bash
-docker build -t interview-prep .
-```
-
-**2. Run the container:**
+### 2. Build the image
 
 ```bash
-docker run -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL="jdbc:mysql://host.docker.internal:3306/interviewprep?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true" \
-  -e SPRING_DATASOURCE_USERNAME=your_mysql_username \
-  -e SPRING_DATASOURCE_PASSWORD=your_mysql_password \
-  interview-prep
+docker build -t interview-backend .
 ```
 
-> `host.docker.internal` lets the container connect to MySQL running on your machine.
-> On Linux, replace it with your machine's local IP (e.g. `192.168.1.x`) or use `--network=host`.
-
-**3. Insert your user** (same as above, run directly in MySQL).
-
-### Option B — Run app + MySQL together with Docker Compose
-
-Create a `docker-compose.yml` in the project root:
-
-```yaml
-services:
-  db:
-    image: mysql:8
-    environment:
-      MYSQL_DATABASE: interviewprep
-      MYSQL_ROOT_PASSWORD: rootpassword
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-
-  app:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/interviewprep?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: rootpassword
-    depends_on:
-      - db
-
-volumes:
-  mysql_data:
-```
-
-Then run:
+### 3. Run the container
 
 ```bash
-docker compose up --build
+docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=docker interview-backend
 ```
 
-> Flyway will run migrations automatically on startup. Manually insert your user into MySQL after the containers are up.
+That's it. The app will be available at `http://localhost:8080`.
 
 ---
 
@@ -226,17 +182,6 @@ Flyway manages all schema changes automatically. Migrations are in `src/main/res
 | V2 | Create `sub_sections` table |
 | V3 | Create `questions` table |
 | V4 | Create `users` table |
-
----
-
-## Environment Variables (Docker overrides)
-
-| Variable | Description |
-|---|---|
-| `SPRING_DATASOURCE_URL` | Full JDBC connection URL |
-| `SPRING_DATASOURCE_USERNAME` | MySQL username |
-| `SPRING_DATASOURCE_PASSWORD` | MySQL password |
-| `APP_JWT_SECRET` | JWT signing secret (optional override) |
 
 ---
 
