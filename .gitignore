@@ -1,10 +1,16 @@
-HELP.md
+# Maven
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.mvn/wrapper/maven-wrapper.jar
 
-### STS ###
+# IDE — IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# IDE — Eclipse / STS
 .apt_generated
 .classpath
 .factorypath
@@ -13,13 +19,7 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
+# IDE — NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
@@ -29,5 +29,26 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# IDE — VS Code
 .vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application config with secrets — create your own from application.yml
+# application-local.yml
+
+# Uploaded files
+uploads/
+
+# Logs
+*.log
+logs/
+
+# Docker
+docker-compose.override.yml
+
+# Environment files
+.env
+.env.local
