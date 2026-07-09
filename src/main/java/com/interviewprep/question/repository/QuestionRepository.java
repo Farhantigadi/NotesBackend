@@ -1,17 +1,21 @@
 package com.interviewprep.question.repository;
 
+import com.interviewprep.auth.User;
 import com.interviewprep.question.entity.Question;
+import com.interviewprep.subsection.entity.SubSection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
 
-    @Query("SELECT q FROM Question q WHERE q.subSection.id = :subSectionId ORDER BY CASE WHEN q.displayOrder IS NULL THEN 1 ELSE 0 END ASC, q.displayOrder ASC")
-    List<Question> findBySubSectionIdOrderByDisplayOrderAsc(@Param("subSectionId") Long subSectionId);
+    Optional<Question> findByIdAndUser(Long id, User user);
 
-    @Query("SELECT q FROM Question q JOIN q.subSection ss WHERE ss.mainSection.id = :sectionId ORDER BY ss.displayOrder ASC, q.displayOrder ASC")
-    List<Question> findAllByMainSectionId(@Param("sectionId") Long sectionId);
+    List<Question> findAllBySubSectionAndUserOrderByDisplayOrderAsc(SubSection subSection, User user);
+
+    @Query("SELECT q FROM Question q JOIN q.subSection ss WHERE ss.mainSection.id = :sectionId AND q.user = :user ORDER BY ss.displayOrder ASC, q.displayOrder ASC")
+    List<Question> findAllByMainSectionIdAndUser(@Param("sectionId") Long sectionId, @Param("user") User user);
 }

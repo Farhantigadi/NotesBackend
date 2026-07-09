@@ -1,5 +1,6 @@
 package com.interviewprep.question.entity;
 
+import com.interviewprep.auth.User;
 import com.interviewprep.common.util.Auditable;
 import com.interviewprep.subsection.entity.SubSection;
 import jakarta.persistence.*;
@@ -49,4 +50,8 @@ public class Question extends Auditable {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sub_section_id", nullable = false)
     private SubSection subSection;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

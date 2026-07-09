@@ -1,7 +1,8 @@
 package com.interviewprep.question.service;
 
-import com.interviewprep.common.exception.ResourceNotFoundException;
+import com.interviewprep.auth.User;
 import com.interviewprep.common.storage.ImageStorageService;
+import com.interviewprep.common.util.CurrentUserResolver;
 import com.interviewprep.question.dto.QuestionCreateRequest;
 import com.interviewprep.question.dto.QuestionResponse;
 import com.interviewprep.question.dto.QuestionUpdateRequest;
@@ -10,9 +11,11 @@ import com.interviewprep.question.mapper.QuestionMapper;
 import com.interviewprep.question.repository.QuestionRepository;
 import com.interviewprep.subsection.entity.SubSection;
 import com.interviewprep.subsection.repository.SubSectionRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -24,20 +27,24 @@ public class QuestionServiceImpl implements QuestionService {
     private final SubSectionRepository subSectionRepository;
     private final QuestionMapper mapper;
     private final ImageStorageService imageStorageService;
+    private final CurrentUserResolver currentUserResolver;
 
     public QuestionServiceImpl(QuestionRepository repository,
                                SubSectionRepository subSectionRepository,
                                QuestionMapper mapper,
-                               ImageStorageService imageStorageService) {
+                               ImageStorageService imageStorageService,
+                               CurrentUserResolver currentUserResolver) {
         this.repository = repository;
         this.subSectionRepository = subSectionRepository;
         this.mapper = mapper;
         this.imageStorageService = imageStorageService;
+        this.currentUserResolver = currentUserResolver;
     }
 
     @Override
     public QuestionResponse create(QuestionCreateRequest request) {
-        SubSection subSection = getSubSectionOrThrow(request.subSectionId());
+        User user = currentUserResolver.get();
+        SubSection subSection = getSubSectionOrThrow(request.subSectionId(), user);
         Question entity = Question.builder()
                 .title(request.title())
                 .answer(request.answer())
@@ -50,6 +57,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .imageWidth(request.imageWidth())
                 .imageAlign(request.imageAlign())
                 .subSection(subSection)
+                .user(user)
                 .build();
         return mapper.toResponse(repository.save(entity));
     }
@@ -57,40 +65,43 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     @Transactional(readOnly = true)
     public List<QuestionResponse> findAll() {
-        return repository.findAll().stream().map(mapper::toResponse).toList();
+        throw new UnsupportedOperationException("Use findBySubSection instead");
     }
 
     @Override
     @Transactional(readOnly = true)
     public QuestionResponse findById(Long id) {
-        return mapper.toResponse(getOrThrow(id));
+        return mapper.toResponse(getOrThrow(id, currentUserResolver.get()));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<QuestionResponse> findBySubSection(Long subSectionId) {
-        return repository.findBySubSectionIdOrderByDisplayOrderAsc(subSectionId)
+        User user = currentUserResolver.get();
+        SubSection subSection = getSubSectionOrThrow(subSectionId, user);
+        return repository.findAllBySubSectionAndUserOrderByDisplayOrderAsc(subSection, user)
                 .stream().map(mapper::toResponse).toList();
     }
 
     @Override
     public QuestionResponse update(Long id, QuestionUpdateRequest request) {
-        Question entity = getOrThrow(id);
+        User user = currentUserResolver.get();
+        Question entity = getOrThrow(id, user);
         mapper.updateEntity(request, entity);
-        entity.setSubSection(getSubSectionOrThrow(request.subSectionId()));
+        entity.setSubSection(getSubSectionOrThrow(request.subSectionId(), user));
         return mapper.toResponse(repository.save(entity));
     }
 
     @Override
     public void delete(Long id) {
-        Question entity = getOrThrow(id);
+        Question entity = getOrThrow(id, currentUserResolver.get());
         imageStorageService.delete(entity.getImageUrl());
-        repository.deleteById(id);
+        repository.delete(entity);
     }
 
     @Override
     public QuestionResponse uploadImage(Long id, MultipartFile file) {
-        Question entity = getOrThrow(id);
+        Question entity = getOrThrow(id, currentUserResolver.get());
         imageStorageService.delete(entity.getImageUrl());
         entity.setImageUrl(imageStorageService.store(file));
         return mapper.toResponse(repository.save(entity));
@@ -98,19 +109,19 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public QuestionResponse deleteImage(Long id) {
-        Question entity = getOrThrow(id);
+        Question entity = getOrThrow(id, currentUserResolver.get());
         imageStorageService.delete(entity.getImageUrl());
         entity.setImageUrl(null);
         return mapper.toResponse(repository.save(entity));
     }
 
-    private Question getOrThrow(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Question", id));
+    private Question getOrThrow(Long id, User user) {
+        return repository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Question not found"));
     }
 
-    private SubSection getSubSectionOrThrow(Long id) {
-        return subSectionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("SubSection", id));
+    private SubSection getSubSectionOrThrow(Long id, User user) {
+        return subSectionRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SubSection not found"));
     }
 }

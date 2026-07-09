@@ -1,5 +1,6 @@
 package com.interviewprep.subsection.entity;
 
+import com.interviewprep.auth.User;
 import com.interviewprep.common.util.Auditable;
 import com.interviewprep.question.entity.Question;
 import com.interviewprep.section.entity.MainSection;
@@ -36,4 +37,8 @@ public class SubSection extends Auditable {
 
     @OneToMany(mappedBy = "subSection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Question> questions = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

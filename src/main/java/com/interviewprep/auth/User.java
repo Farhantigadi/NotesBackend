@@ -22,4 +22,7 @@ public class User extends Auditable {
 
     @Column(nullable = false, length = 255)
     private String password;
+
+    @Column(columnDefinition = "LONGTEXT")
+    private String notes;
 }

@@ -1,5 +1,6 @@
 package com.interviewprep.section.entity;
 
+import com.interviewprep.auth.User;
 import com.interviewprep.common.util.Auditable;
 import com.interviewprep.subsection.entity.SubSection;
 import jakarta.persistence.*;
@@ -31,4 +32,8 @@ public class MainSection extends Auditable {
 
     @OneToMany(mappedBy = "mainSection", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubSection> subSections = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

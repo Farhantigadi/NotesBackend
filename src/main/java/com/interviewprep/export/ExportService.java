@@ -1,6 +1,7 @@
 package com.interviewprep.export;
 
-import com.interviewprep.common.exception.ResourceNotFoundException;
+import com.interviewprep.auth.User;
+import com.interviewprep.common.util.CurrentUserResolver;
 import com.interviewprep.question.entity.Question;
 import com.interviewprep.question.repository.QuestionRepository;
 import com.interviewprep.section.entity.MainSection;
@@ -9,8 +10,10 @@ import com.interviewprep.subsection.entity.SubSection;
 import com.interviewprep.subsection.repository.SubSectionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -26,28 +29,32 @@ public class ExportService {
     private final SubSectionRepository subSectionRepository;
     private final QuestionRepository questionRepository;
     private final PdfGeneratorService pdfGeneratorService;
+    private final CurrentUserResolver currentUserResolver;
 
     public ExportService(SectionRepository sectionRepository,
                          SubSectionRepository subSectionRepository,
                          QuestionRepository questionRepository,
-                         PdfGeneratorService pdfGeneratorService) {
+                         PdfGeneratorService pdfGeneratorService,
+                         CurrentUserResolver currentUserResolver) {
         this.sectionRepository = sectionRepository;
         this.subSectionRepository = subSectionRepository;
         this.questionRepository = questionRepository;
         this.pdfGeneratorService = pdfGeneratorService;
+        this.currentUserResolver = currentUserResolver;
     }
 
     public byte[] exportSectionAsPdf(Long sectionId) {
         long start = System.currentTimeMillis();
         log.info("Export PDF requested for mainSectionId={}", sectionId);
 
-        MainSection section = sectionRepository.findById(sectionId)
-                .orElseThrow(() -> new ResourceNotFoundException("MainSection", sectionId));
+        User user = currentUserResolver.get();
+        MainSection section = sectionRepository.findByIdAndUser(sectionId, user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Section not found"));
 
         log.info("Exporting section: '{}'", section.getTitle());
 
-        List<SubSection> subSections = subSectionRepository.findByMainSectionIdOrderByDisplayOrderAsc(sectionId);
-        List<Question> questions = questionRepository.findAllByMainSectionId(sectionId);
+        List<SubSection> subSections = subSectionRepository.findAllByMainSectionAndUser(section, user);
+        List<Question> questions = questionRepository.findAllByMainSectionIdAndUser(sectionId, user);
 
         log.info("Found {} subsections and {} questions for section '{}'",
                 subSections.size(), questions.size(), section.getTitle());
