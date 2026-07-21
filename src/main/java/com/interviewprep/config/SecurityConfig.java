@@ -1,12 +1,15 @@
 package com.interviewprep.config;
 
 import com.interviewprep.auth.JwtAuthFilter;
+import com.interviewprep.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -19,6 +22,17 @@ public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+
+    @Bean
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return username -> userRepository.findByUsername(username)
+                .map(user -> org.springframework.security.core.userdetails.User
+                        .withUsername(user.getUsername())
+                        .password(user.getPassword())
+                        .authorities("ROLE_USER")
+                        .build())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
