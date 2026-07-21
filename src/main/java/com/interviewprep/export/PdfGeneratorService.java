@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -215,10 +216,15 @@ public class PdfGeneratorService {
         labelPara.setSpacingAfter(5);
         doc.add(labelPara);
 
-        Paragraph body = new Paragraph(content, fontBody);
+        Paragraph body = new Paragraph(stripHtml(content), fontBody);
         body.setLeading(LEADING_BODY);
         body.setSpacingAfter(14);
         doc.add(body);
+    }
+
+    private String stripHtml(String html) {
+        if (html == null) return "";
+        return Jsoup.parse(html).text();
     }
 
     // ── Code block ────────────────────────────────────────────────────────────
